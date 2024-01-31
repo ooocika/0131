@@ -1,0 +1,708 @@
+import java.beans.BeanProperty;
+import java.net.http.WebSocket;
+
+import com.oracle.svm.core.annotate.Substitute;
+import com.oracle.truffle.api.HostCompilerDirectives.BytecodeInterpreterSwitch;
+
+import org.graalvm.compiler.graph.Node.ConstantNodeParameter;
+
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+@RestController
+@RequestMapping("/account")
+public class AccountController {
+
+  @GetMapping("/{id}")
+  public Mono<Account> retrieve(@PathVariable Long id) {
+
+  }
+
+  @DeleteMapping("/{id} ")
+  public Mono<Void> remove(@PathVariable Long id) {
+  }
+}
+
+//
+@CrossOrigin(maxAge = 3600)
+@RestController
+@RequestMapping("/account")
+public class AccountController {
+
+  @CrossOrigin("http://domain2.com")
+  @GetMapping("/{id}")
+  public Mono<Account> retrieve(@PathVariable Long id) {
+
+  }
+
+  @DeleteMapping("/{id}")
+  public Mono<void> remove(@PathVariable Long id){
+    
+  }
+}
+
+//
+@Configuration
+@EnableWebFlux
+public class WebConfig implements WebFluxConfigurer {
+
+  @Override
+  public void addCorsMappings(CorsRegistry registrer) {
+
+    registry.addMapping("/ai/**")
+        .allowedOrigins("http://domain2.com")
+        .allowedMethods("PUT", "DELETE")
+        .allowedHeaders("header1", "header2", "header3")
+        .exposedHeaders("header1", "header2")
+        .allowCredentials(true).maxAge(3600);
+  }
+
+  }
+
+  //
+@Bean
+
+  CorsWebFilter corsFilter(){
+
+  CorsConfiguration config = new CorsConfiguration();
+
+  config.setAllowCredentials(true);
+  config.addAllowedOrigin("https://domain1.com")
+  config.allAllowedHeader("*");
+  config.addAllowedMethod("*");
+
+  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  source.registerCorsConfiguration("/**", config);
+
+  return new CorsWebFilter(source);
+    }
+
+  //
+  CachControl ccCachoneOneHour = CacheControl.maxAge(1, TimeUnit.HOURS);
+
+  CacheControl ccNoStore = CacheControl.noStore();
+
+  CacheControl ccNoCache = CacheControl.maxAge(10,
+      TimeUnit.DAYS).noTransform().cachePublic();
+
+  //
+  @GetMapping("/book/{id}")
+  public ResponseEntity<Book> showBook(@PathVariable Long id) {
+
+    Book book = findBook(id);
+    String version = book.getVersion();
+
+    return ResponseEntity
+        .ok()
+        .cacheControl(CachControl.maxAge(30, TimeUnit.DAYS))
+        .eTag(version)
+        .body(book);
+  }
+
+  //
+@RequestMapping
+  public String myHandleMethod(ServerWebExchange exchange, Model model){
+
+  long eTag = ...
+
+    if(exchange.checkNotModified(eTag)){
+    return null;
+    }
+
+  model.addAttribute(...);
+  return "myViewName";
+  }
+
+  //
+  @Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer {
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+      registry.freeMarker();
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freeMarkerConfigurer() {
+      FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+      configurer.setTemplateLoaderPath("classpath:/templates//freemarker");
+      return configurer;
+    }
+  }
+
+  //
+  @Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer {
+
+    @Bean
+    public FreeMarkerConfigurer freeMarkerConfigurer(){
+      Map<String, Object> variables = new HashMap<>();
+      variables.put("xml_escape", new XmlEscape())
+    
+        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+        configurer.setTemplateLoaderPath("classpath:/templates");
+         configurer.setFreemarkerVariables(variables) ;
+    return configurer;
+    }
+  }
+
+  //
+  @Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer {
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+      registry.scriptTemplate();
+    }
+
+    @Bean
+    public ScriptTemplateConfigurer configurer() {
+      ScriptTemplateConfigurer configurer = new ScriptTemplateConfigurer();
+      configurer.setEngineName("nashorn");
+      configurer.setScripts("mustache.js");
+      configurer.setRenderObject("Mustache");
+      configurer.setRenderFunction("render");
+      return configurer;
+
+    }
+  }
+
+  //
+  @Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer {
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+      registry.scriptTemplate();
+    }
+
+    @Bean
+    public ScriptTemplateConfigurer configurer() {
+
+      ScriptTemplateConfigurer configurer = new ScriptTemplateConfigurer();
+      configurer.setEngineName("nashorn");
+      configurer.setScripts("polyfill.js", "handlebars.js", "render.js");
+      configurer.setSharedEngine(false);
+      return configurer;
+
+    }
+  }
+
+  //
+var window = {};
+
+  //
+function render(template, model){
+  var compiledTemplate = Handlebars.compile(template);
+  return compiledTemplate(model);
+}
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig i{
+    }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void addFormatters(FormatterRegistry registry){
+      
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void addFormatters(FormatterRegistry registry){
+      DateTimeFormatterRegistry registry = new DateTimeFormatterRegistrar();
+      registrar.setUseIsoFormat(true);
+      registrar.registerFormatters(registry);
+    
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public Validator getValidator(){
+      
+    }
+  }
+//
+@Controller 
+  public class MyController{
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder){
+      binder.addValidators(new FooValidator());
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configureContentTypeResolver(RequestContentTypeResolverBuilder
+                                            builder){
+      
+                                            }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer){
+      configurer.defaultCodecs().maxInMemorySize(512*1024));
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry){
+      
+    }
+  }
+//
+@Configuration
+@EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry){
+      registry.freeMarker();
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freeMarkerConfigurer(){
+      FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+      configurer.setTemplateLoaderPath("classpath:/templates");
+      return configurer;
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry){
+     ViewResolver resolver = ...;
+      registry.viewResolver(resolver);
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry){
+      registry.freemarker();
+
+      Jackson2JsonEncode encoder = new Jackson2JsonEncode();
+      registry.defaultView(new HttpMessageWriterView(encoder));
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry){
+      registry.addResourceHandler("/resources/**")
+        .addResourceLocations("/public ", "classpath:/static/")
+        .setCacheControl(CachControl.maxAge(365, TimeUnit.DAYS));
+        }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry){
+      registry.addResourceHandler("/resources/**")
+        .addResourceLocations("/public/")
+        .resourceChain(true)
+        .addResolver(new
+                    VersionResourceResolver().addContentVersionStrategy("/**"));
+    }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfig implements WebFluxConfigurer{
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer){
+      configurer
+        .setUseCaseSensitiveMatch(false)
+        .addPathPrefix("/api",
+                      HandlerTypePredicate.forAnnotation(RestControlller.class));
+        
+        }
+  }
+//
+@Configuration
+  @EnableWebFlux
+  public class WebConfin implements WebFluxConfigurer{
+
+    @Override
+    public WebSocketService getWebSocketService(){
+      TomcatRequestUpgradeStrategy strategy = new TomcatRequestUpgradeStrategy();
+      strategy.setMaxSessionIdleTimeout(0L);
+    return new HandshakeWebSocketService(strategy);
+    }
+  }
+//
+@Configuration
+  public class WebConfig extends DelegatingWebFluxConfiguration{
+    
+  }
+//6.2. WebClient 1228P
+WebClient client = WebClient.builder()
+  .codecs(configurer -> ...)
+  .build();
+//
+WebClient client1 = WebClient.builder()
+  .filter(filterA).filter(filterB).build();
+
+WebClient client2 = client.mutate()
+  .filter(filterC).filter(filterD).build();
+//
+WebClient webClient = WebClient.builder()
+  .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(2*1024))
+  .build();
+//
+HttpClient httpClient = HttpClient.create().secure(sslSpec -> ...);
+
+WebClient webClient = WebClient.builder()
+  .clientConnector(new ReactorClientHttpConnector(httpClient))
+  .build();
+//
+@Bean
+  public ReactorResourceFactory reactorResourceFactory(){
+  return new ReactorResourceFactory();
+  }
+//
+@Bean
+  public ReactorResourceFactory reactorFactory(){
+
+    ReactorResourceFactory factory = new ReactorResourceFactory();
+    factory.setUseGlobalResources(false);
+  
+    return factory;
+  }
+@Bean
+  public WebClient webClient()
+  {
+  Function<HttpClient, HttpClient> mapper = client ->{
+
+    
+  };
+
+  ClientHttpConnector connector = 
+    new ReactorClientHttpConnector(resourceFactory(), mapper);
+
+  return WebClient.builder().clientConnector(connector).build();
+  
+}//
+HttpClient httpClient = HttpClient.create()
+  .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+
+  WebClient webClient = WebClient.builder()
+  .clientConnector(new ReactorClientHttpConnector(httpClient))
+  .build();
+//
+HttpClient httpClient = HttpClient.create()
+  .doOnConnected(conn -> conn
+                .addHandlerLast(new ReadTimeoutHandler(10))
+                .addHandlerLast(new WriteTimeoutHandler(10))
+                );
+
+HttpClient httpClient = HttpClients.create()
+  .responseTimeout(Duration.ofSeconds(2));
+//
+WebClient.create().get()
+  .uri("http://localhost:8080/api/books"
+      .httpRequest(httpRequest -> {
+        HttpClientRequest reactorRequest = httpRequest.getNativeRequest();
+        reactorRequest.responseTimnout(Duration.ofSeconds(2));
+      
+      })
+       .retrieve()
+       .bodyToMono(String.class);
+//
+HttpClient httpClient = HttpClient.newBuilder()
+  .followRedirects(Redirect.NORMAL)
+  .connectTimeout(Duration.ofSeconds(20))
+  .build();
+
+ClientHttpConnector connector = 
+  new JdkClientHttpConnector(httpClient, new DefaultDataBufferFactory());
+
+WebClient webClient = WebClient.builder().clientConnect(connector).build();
+//
+HttpClient httpClient = new HttpClient();
+httpClient.setCookieStore(...);
+
+WebClient webClient = WebClient.builder()
+  .clientConnector(new JdkClientHttpConnector(httpClient))
+  .build();
+//
+@Bean
+  public JettyResourceFactory resourceFactory(){
+  return new JettyResourceFactory();
+  }
+
+@Bean
+  public WebClient webClient(){
+
+  HttpClient httpClient = new HttpClient();
+
+  ClientHttpConnector connector = 
+    new JettyClientHttpConnector(httpClient,resourceFactory());
+
+  return WebClient.builder().clientConnector(connector).build();
+  
+}
+//
+HttpAsynClientBuilder clientBuilder = HttpAsyncClients.custom();
+clientBuilder.setDefaultRequestConfig(...);
+CloseableHttpAsynClient client = clientBuilder.build();
+
+ClientHttpConnect connector = new HttpComponentsClientHttpConnector(client);
+
+WebClient webClient = WebClient.builder().clientConnector(connector).build();
+
+//
+WebClient client = WebClient.create("https://example.org");
+
+Mono<ResponseEntity<Person>>result = client.get()
+  .uri("/persons/{id}", id).accept(MediaType.APPLICATION_JSON)
+  .retrieve()
+  .toEntity(Person.class)
+  //
+  WebClient client = WebClient.create("https://example.org");
+
+Mono<Person>resulr = client.get()
+  .uri("/persons/{id}", id).accept(MediaType.APPLICATION_JSON)
+  .retrieve()
+  .bodyToMono(Person.class);
+//
+Flux<Quote>result = client.get()
+  .uri("/quotes").accept(MediaType.TEXT_EVENT_STREAM)
+  .retrieve()
+  .bodyToFlux(Quote.class);
+//
+Mono<Person>result = client.get()
+  .uri("/persons/{id}", id).accept(MediaType.APPLICATION_JSON)
+  .retrieve()
+  .onStatus(HttpStatus::is4xxClientError, response -> ...)
+  .onStatus(HttpStatus::is5xxClientError, response -> ...)
+  .bodyToMono(Person.class);
+//
+Mono<Person> entityMono = client.get()
+  .uri("/persons/1")
+  .accept(MediaType.APPLICATION_JSON)
+  .exchangeToMono(response ->{
+    if(response.statusCode().equals(HttpStatus.OK)){
+      return response.bodyToMono(Person.class);
+
+      
+    }else{
+      return response.createError();
+    }
+  });
+//
+Mono<Person> personMono = ...;
+
+Mono<Void> result = clinet.post()
+  .uri("/persons/{id}", id)
+  .contentType(MedioType.APPLICATION_JSON)
+  .body(personMono, Person.class)
+  .retrieve()
+  .bodyToMono(Void.class);
+//
+Flux<Person>personFlux = ..;
+
+Mono<Void> result = client.post()
+  uri("persons/{id}", id)
+  .contentType(MediaType.APPLICATION_JSON)
+  .body((personFlux, Person.class)
+  .retrieve()
+  .bodyToMono(Void.class);
+//
+Person person = ...;
+
+Mono<Void> result = client.post()
+  .uri("persons/{id}", id)
+  .contentType(MediaType.APPLICATION_JSON)
+  .bodyValue(person)
+  .retrieve()
+  .bodyToMono(Void.class);
+//
+MultiValueMap<String, String> formData = ...;
+
+Mono<Void> result = client.post()
+  .uri("/path", id)
+  .bodyValue(formData)
+  .retrieve()
+  .bodyToMono(Void.class);
+//
+Mono<Void> result = client.post()
+  .uri("/path", id)
+  .body(fromFormData("k1","v1"). with("k2","v2"))
+       .retrieve()
+  .bodyToMono(Void.class);
+//
+MutipartBodyBuilder builder = MultiPartBodyBuilder.create();
+builder.part("fieldPart", "fieldValue");  
+builder.part("filePart", new FileSystemResource("...logo.png"));
+builder.part("jsonPart", new Person("jason"));
+builder.part("myPart", part);
+
+MultiValueMap<String, HttpEntity<?>>parts = builder.build();
+//
+MultipartBodyBuilder builder = ..;
+
+Mono<Void> result = client.post()
+  .uri("/path", id)
+  .body(builder.build())
+  .retrieve()
+  .bodyToMono(Void.class);
+//
+Mono<Void> result = client.post()
+  .uri("/path", id)
+  .body(fromMultipartData("fieldPart", "value"), with("filePart", resource))
+retrieve()
+  .bodyToMono(Void.class);
+//
+Resource resource = ...;
+Mono<String> result = webClient
+  .post()
+  .uri("https://example.com")
+  .body(Flux.concat(
+    FormPartEvent.create("field", field value),
+    FilePartEvent.create("file", resource)
+  ),PartEvent.class)
+  .retrieve()
+  .bodyToMono(String.class);
+//
+
+WebClient client = WebClient.builder()
+  .filter((request, next) ->
+         
+         ClientRequest filtered = ClientRequest.from(request)
+  .header("foo","bar")
+  .build();
+
+return next.exchange(filtered);
+  
+})
+.build();
+
+//
+WebClient client = WebClient.builder()
+  .filter(basicAuthentication("user", "password"))
+  .build();
+WebClient client = WebClient.mutate()
+  .filters(filterList ->{
+    filterList.add(basicAuthentication("user", "password"));
+  })
+  .build();
+//
+public ExchangeFilterFunction renewTokenFilter(){
+  return (request, next) -> next.exchange(request).flatMap(response ->{
+    if(response.statusCode().value() == HttpStatus.UNAUTORIZED.value()){
+      return response.releaseBody()
+        .then(renewToken()
+              .flatMap(token -> {
+                ClientRequest newRequest = 
+                  ClientRequest.from(request).build();
+                return next.exchange(newRequest);
+              });
+    }else{
+      return Mono.just(response);
+    }
+  });
+}
+//
+
+WebClient client = WebClient.builder()
+  .filter((request, next) ->{
+
+    Optional<Object>usr = request.attribute("myAttribute");
+  })
+  .build();
+
+client.get().uri("http://example.org/")
+  .attribute("myAttribute", "...")
+  .retrieve()
+  .bodyToMono(Void.class)
+  
+
+  }
+//
+  WebClient client = WebClient.builder()
+              .filter((request, next) ->
+                     Mono.deferContextual(contextView ->{
+                       String value = contextView.get("foo");
+                     }))
+              .build();
+
+client.get().uri("http://example.org/")
+  .retrieve()
+  .bodyToMono(String.class)
+  .flatMap(body ->{
+    
+  })
+  .contextWrite(context->context.put("foo", ...));
+
+.Person person = cliend.get().uri("/person/{id}", i).retrieve()
+  .bodyToMono(Person.class)
+  .block();
+
+List(Person)persons = client.get().uri("/persons").retrieve()
+  .bodyToMono(Person.class)
+  .collectList()
+  .block();
+//
+Mono<Person>personMono = client.get().uri("/persons/{id}", personId)
+  .retrieve().bodyToMono(Person.class);
+
+Mono<List<Hobby>>hobbyMono = client.get().uri("/persons/{id}/hobbies", personId)
+  .retrieve().bodyToFlux(Hobby.class).collectList();
+
+Map<String, Object>data = Mono.zip(personMono, hobbyMono, (person,hobbies) ->{
+  Map<String, String> map = new LinkedHashMap<>();
+
+  map.put("person", person);
+  map.put("hobbies", hobbies);
+  return map;
+})
+
+  .block();//1250P
+
